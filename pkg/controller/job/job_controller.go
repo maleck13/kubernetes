@@ -17,6 +17,7 @@ limitations under the License.
 package job
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"reflect"
@@ -109,7 +110,8 @@ func NewJobController(podInformer coreinformers.PodInformer, jobInformer batchin
 		recorder:     eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: "job-controller"}),
 	}
 
-	jobInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	ctx := context.TODO()
+	jobInformer.Informer(ctx).AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			jm.enqueueController(obj, true)
 		},
@@ -118,16 +120,16 @@ func NewJobController(podInformer coreinformers.PodInformer, jobInformer batchin
 			jm.enqueueController(obj, true)
 		},
 	})
-	jm.jobLister = jobInformer.Lister()
-	jm.jobStoreSynced = jobInformer.Informer().HasSynced
+	jm.jobLister = jobInformer.Lister(ctx)
+	jm.jobStoreSynced = jobInformer.Informer(ctx).HasSynced
 
-	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	podInformer.Informer(ctx).AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    jm.addPod,
 		UpdateFunc: jm.updatePod,
 		DeleteFunc: jm.deletePod,
 	})
-	jm.podStore = podInformer.Lister()
-	jm.podStoreSynced = podInformer.Informer().HasSynced
+	jm.podStore = podInformer.Lister(ctx)
+	jm.podStoreSynced = podInformer.Informer(ctx).HasSynced
 
 	jm.updateHandler = jm.updateJobStatus
 	jm.syncHandler = jm.syncJob
@@ -417,7 +419,7 @@ func (jm *JobController) getPodsForJob(j *batch.Job) ([]*v1.Pod, error) {
 	// If any adoptions are attempted, we should first recheck for deletion
 	// with an uncached quorum read sometime after listing Pods (see #42639).
 	canAdoptFunc := controller.RecheckDeletionTimestamp(func() (metav1.Object, error) {
-		fresh, err := jm.kubeClient.BatchV1().Jobs(j.Namespace).Get(j.Name, metav1.GetOptions{})
+		fresh, err := jm.kubeClient.BatchV1().Jobs(j.Namespace).Get(context.TODO(), j.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, err
 		}
@@ -828,7 +830,7 @@ func (jm *JobController) updateJobStatus(job *batch.Job) error {
 			break
 		}
 		newJob.Status = job.Status
-		if _, err = jobClient.UpdateStatus(newJob); err == nil {
+		if _, err = jobClient.UpdateStatus(context.TODO(), newJob); err == nil {
 			break
 		}
 	}

@@ -17,6 +17,7 @@ limitations under the License.
 package node
 
 import (
+	"context"
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,7 +40,7 @@ func UpdateOrCreateTokens(client clientset.Interface, failIfExists bool, tokens 
 	for _, token := range tokens {
 
 		secretName := bootstraputil.BootstrapTokenSecretName(token.Token.ID)
-		secret, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Get(secretName, metav1.GetOptions{})
+		secret, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Get(context.TODO(), secretName, metav1.GetOptions{})
 		if secret != nil && err == nil && failIfExists {
 			return fmt.Errorf("a token with id %q already exists", token.Token.ID)
 		}
@@ -47,7 +48,7 @@ func UpdateOrCreateTokens(client clientset.Interface, failIfExists bool, tokens 
 		updatedOrNewSecret := token.ToSecret()
 		// Try to create or update the token with an exponential backoff
 		err = apiclient.TryRunCommand(func() error {
-			if err := apiclient.CreateOrUpdateSecret(client, updatedOrNewSecret); err != nil {
+			if err := apiclient.CreateOrUpdateSecret(context.TODO(), client, updatedOrNewSecret); err != nil {
 				return fmt.Errorf("failed to create or update bootstrap token with name %s: %v", secretName, err)
 			}
 			return nil

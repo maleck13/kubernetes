@@ -17,6 +17,7 @@ limitations under the License.
 package kubeletconfig
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"

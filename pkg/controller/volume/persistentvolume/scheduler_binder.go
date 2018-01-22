@@ -17,6 +17,7 @@ limitations under the License.
 package persistentvolume
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -114,13 +115,13 @@ func NewVolumeBinder(
 	// TODO: find better way...
 	ctrl := &PersistentVolumeController{
 		kubeClient:  kubeClient,
-		classLister: storageClassInformer.Lister(),
+		classLister: storageClassInformer.Lister(context.TODO()),
 	}
 
 	b := &volumeBinder{
 		ctrl:            ctrl,
-		pvcCache:        NewPVCAssumeCache(pvcInformer.Informer()),
-		pvCache:         NewPVAssumeCache(pvInformer.Informer()),
+		pvcCache:        NewPVCAssumeCache(pvcInformer.Informer(context.TODO())),
+		pvCache:         NewPVAssumeCache(pvInformer.Informer(context.TODO())),
 		podBindingCache: NewPodBindingCache(),
 	}
 
