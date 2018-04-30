@@ -154,10 +154,12 @@ func (f *sharedInformerFactory) InformerFor(ctx context.Context, obj runtime.Obj
 	if exists {
 		return informer
 	}
+
 	resyncPeriod, exists := f.customResync[informerType]
 	if !exists {
 		resyncPeriod = f.defaultResync
 	}
+
 	informer = newFunc(ctx, f.client, resyncPeriod)
 	f.informers[informerType] = informer
 

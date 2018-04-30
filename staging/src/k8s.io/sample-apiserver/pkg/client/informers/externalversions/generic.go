@@ -62,7 +62,7 @@ func (f *sharedInformerFactory) ForResource(ctx context.Context, resource schema
 
 		// Group=wardle.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithResource("flunders"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Wardle().V1beta1().Flunders().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Wardle().V1beta1().Flunders().Informer(ctx)}, nil
 
 	}
 
