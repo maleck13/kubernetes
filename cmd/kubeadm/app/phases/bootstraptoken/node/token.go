@@ -17,6 +17,7 @@ limitations under the License.
 package node
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -46,9 +47,10 @@ func UpdateOrCreateToken(client clientset.Interface, token string, failIfExists 
 		return err
 	}
 	secretName := fmt.Sprintf("%s%s", bootstrapapi.BootstrapTokenSecretPrefix, tokenID)
+	ctx := context.TODO()
 	var lastErr error
 	for i := 0; i < tokenCreateRetries; i++ {
-		secret, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Get(secretName, metav1.GetOptions{})
+		secret, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Get(ctx, secretName, metav1.GetOptions{})
 		if err == nil {
 			if failIfExists {
 				return fmt.Errorf("a token with id %q already exists", tokenID)
@@ -59,7 +61,7 @@ func UpdateOrCreateToken(client clientset.Interface, token string, failIfExists 
 				return err
 			}
 			secret.Data = tokenSecretData
-			if _, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Update(secret); err == nil {
+			if _, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Update(ctx, secret); err == nil {
 				return nil
 			}
 			lastErr = err
@@ -80,7 +82,7 @@ func UpdateOrCreateToken(client clientset.Interface, token string, failIfExists 
 				Type: v1.SecretType(bootstrapapi.SecretTypeBootstrapToken),
 				Data: tokenSecretData,
 			}
-			if _, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Create(secret); err == nil {
+			if _, err := client.CoreV1().Secrets(metav1.NamespaceSystem).Create(ctx, secret); err == nil {
 				return nil
 			}
 			lastErr = err

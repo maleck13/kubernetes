@@ -17,6 +17,7 @@ limitations under the License.
 package kubectl
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
@@ -633,7 +634,7 @@ type noSuchPod struct {
 	coreclient.PodInterface
 }
 
-func (c *noSuchPod) Get(name string, options metav1.GetOptions) (*api.Pod, error) {
+func (c *noSuchPod) Get(ctx context.Context, name string, options metav1.GetOptions) (*api.Pod, error) {
 	return nil, fmt.Errorf("%s does not exist", name)
 }
 
@@ -641,7 +642,7 @@ type noDeletePod struct {
 	coreclient.PodInterface
 }
 
-func (c *noDeletePod) Delete(name string, o *metav1.DeleteOptions) error {
+func (c *noDeletePod) Delete(ctx context.Context, name string, o *metav1.DeleteOptions) error {
 	return fmt.Errorf("I'm afraid I can't do that, Dave")
 }
 

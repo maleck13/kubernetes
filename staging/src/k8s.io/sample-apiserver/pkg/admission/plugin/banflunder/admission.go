@@ -17,10 +17,9 @@ limitations under the License.
 package banflunder
 
 import (
+	"context"
 	"fmt"
 	"io"
-
-	"context"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
