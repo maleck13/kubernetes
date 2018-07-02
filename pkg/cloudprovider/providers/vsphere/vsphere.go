@@ -245,7 +245,7 @@ func (vs *VSphere) SetInformers(informerFactory informers.SharedInformerFactory)
 		secretCredentialManager := &SecretCredentialManager{
 			SecretName:      vs.cfg.Global.SecretName,
 			SecretNamespace: vs.cfg.Global.SecretNamespace,
-			SecretLister:    informerFactory.Core().V1().Secrets().Lister(),
+			SecretLister:    informerFactory.Core().V1().Secrets().Lister(context.TODO()),
 			Cache: &SecretCache{
 				VirtualCenter: make(map[string]*Credential),
 			},

@@ -51,7 +51,7 @@ const (
 // DeployedDNSAddon returns the type of DNS addon currently deployed
 func DeployedDNSAddon(client clientset.Interface) (string, string, error) {
 	deploymentsClient := client.AppsV1().Deployments(metav1.NamespaceSystem)
-	deployments, err := deploymentsClient.List(metav1.ListOptions{LabelSelector: "k8s-app=kube-dns"})
+	deployments, err := deploymentsClient.List(context.TODO(), metav1.ListOptions{LabelSelector: "k8s-app=kube-dns"})
 	if err != nil {
 		return "", "", fmt.Errorf("couldn't retrieve DNS addon deployments: %v", err)
 	}

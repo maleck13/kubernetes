@@ -189,7 +189,7 @@ func (c *AvailableConditionController) sync(key string) error {
 			availableCondition.Reason = "ServicePortError"
 			availableCondition.Message = fmt.Sprintf("service/%s in %q is not listening on port 443", apiService.Spec.Service.Name, apiService.Spec.Service.Namespace)
 			apiregistration.SetAPIServiceCondition(apiService, availableCondition)
-			_, err := c.apiServiceClient.APIServices().UpdateStatus(apiService)
+			_, err := c.apiServiceClient.APIServices().UpdateStatus(context.TODO(), apiService)
 			return err
 		}
 

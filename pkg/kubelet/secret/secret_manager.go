@@ -19,7 +19,6 @@ package secret
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	"k8s.io/api/core/v1"
@@ -120,7 +119,7 @@ const (
 //   value in cache; otherwise it is just fetched from cache
 func NewCachingSecretManager(kubeClient clientset.Interface, getTTL manager.GetObjectTTLFunc) Manager {
 	getSecret := func(namespace, name string, opts metav1.GetOptions) (runtime.Object, error) {
-		return kubeClient.CoreV1().Secrets(namespace).Get(name, opts)
+		return kubeClient.CoreV1().Secrets(namespace).Get(context.TODO(), name, opts)
 	}
 	secretStore := manager.NewObjectStore(getSecret, clock.RealClock{}, getTTL, defaultTTL)
 	return &secretManager{
@@ -135,11 +134,12 @@ func NewCachingSecretManager(kubeClient clientset.Interface, getTTL manager.GetO
 //   referenced objects that aren't referenced from other registered pods
 // - every GetObject() returns a value from local cache propagated via watches
 func NewWatchingSecretManager(kubeClient clientset.Interface) Manager {
+	ctx := context.TODO()
 	listSecret := func(namespace string, opts metav1.ListOptions) (runtime.Object, error) {
-		return kubeClient.CoreV1().Secrets(namespace).List(opts)
+		return kubeClient.CoreV1().Secrets(namespace).List(ctx, opts)
 	}
 	watchSecret := func(namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-		return kubeClient.CoreV1().Secrets(namespace).Watch(opts)
+		return kubeClient.CoreV1().Secrets(namespace).Watch(ctx, opts)
 	}
 	newSecret := func() runtime.Object {
 		return &v1.Secret{}

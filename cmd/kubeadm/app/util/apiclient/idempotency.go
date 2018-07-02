@@ -208,7 +208,8 @@ func PatchNode(client clientset.Interface, nodeName string, patchFn func(*v1.Nod
 	// Loop on every false return. Return with an error if raised. Exit successfully if true is returned.
 	return wait.Poll(constants.APICallRetryInterval, constants.PatchNodeTimeout, func() (bool, error) {
 		// First get the node object
-		n, err := client.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+		ctx := context.TODO()
+		n, err := client.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 		if err != nil {
 			return false, nil
 		}
@@ -237,7 +238,7 @@ func PatchNode(client clientset.Interface, nodeName string, patchFn func(*v1.Nod
 			return false, err
 		}
 
-		if _, err := client.CoreV1().Nodes().Patch(n.Name, types.StrategicMergePatchType, patchBytes); err != nil {
+		if _, err := client.CoreV1().Nodes().Patch(ctx, n.Name, types.StrategicMergePatchType, patchBytes); err != nil {
 			if apierrors.IsConflict(err) {
 				fmt.Println("[patchnode] Temporarily unable to update node metadata due to conflict (will retry)")
 				return false, nil

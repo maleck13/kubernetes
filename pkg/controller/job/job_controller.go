@@ -825,7 +825,7 @@ func (jm *JobController) updateJobStatus(job *batch.Job) error {
 	var err error
 	for i := 0; i <= statusUpdateRetries; i = i + 1 {
 		var newJob *batch.Job
-		newJob, err = jobClient.Get(job.Name, metav1.GetOptions{})
+		newJob, err = jobClient.Get(context.TODO(), job.Name, metav1.GetOptions{})
 		if err != nil {
 			break
 		}

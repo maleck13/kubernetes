@@ -2098,7 +2098,7 @@ func TestAdmitLimitedScopeWithCoverQuota(t *testing.T) {
 		informerFactory := informers.NewSharedInformerFactory(kubeClient, controller.NoResyncPeriodFunc())
 		quotaAccessor, _ := newQuotaAccessor()
 		quotaAccessor.client = kubeClient
-		quotaAccessor.lister = informerFactory.Core().InternalVersion().ResourceQuotas().Lister()
+		quotaAccessor.lister = informerFactory.Core().InternalVersion().ResourceQuotas().Lister(context.TODO())
 
 		quotaConfiguration := install.NewQuotaConfigurationForAdmission()
 		evaluator := NewQuotaEvaluator(quotaAccessor, quotaConfiguration.IgnoredResources(), generic.NewRegistry(quotaConfiguration.Evaluators()), nil, config, 5, stopCh)

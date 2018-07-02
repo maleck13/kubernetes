@@ -48,7 +48,7 @@ func UpdateOrCreateTokens(client clientset.Interface, failIfExists bool, tokens 
 		updatedOrNewSecret := token.ToSecret()
 		// Try to create or update the token with an exponential backoff
 		err = apiclient.TryRunCommand(func() error {
-			if err := apiclient.CreateOrUpdateSecret(context.TODO(), client, updatedOrNewSecret); err != nil {
+			if err := apiclient.CreateOrUpdateSecret(client, updatedOrNewSecret); err != nil {
 				return fmt.Errorf("failed to create or update bootstrap token with name %s: %v", secretName, err)
 			}
 			return nil

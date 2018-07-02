@@ -289,7 +289,7 @@ func (b *volumeBinder) BindPodVolumes(assumedPod *v1.Pod) error {
 	// Update claims objects to trigger volume provisioning. Let the PV controller take care of the rest
 	// PV controller is expect to signal back by removing related annotations if actual provisioning fails
 	for i, claim := range claimsToProvision {
-		if _, err := b.ctrl.kubeClient.CoreV1().PersistentVolumeClaims(claim.Namespace).Update(claim); err != nil {
+		if _, err := b.ctrl.kubeClient.CoreV1().PersistentVolumeClaims(claim.Namespace).Update(context.TODO(), claim); err != nil {
 			glog.V(4).Infof("updating PersistentVolumeClaim[%s] failed: %v", getPVCName(claim), err)
 			// only revert assumed cached updates for claims we haven't successfully updated
 			b.revertAssumedPVCs(claimsToProvision[i:])

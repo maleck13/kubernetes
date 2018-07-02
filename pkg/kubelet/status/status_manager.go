@@ -493,7 +493,7 @@ func (m *manager) syncPod(uid types.UID, status versionedPodStatus) {
 	}
 
 	oldStatus := pod.Status.DeepCopy()
-	newPod, patchBytes, err := statusutil.PatchPodStatus(context.TODO(), m.kubeClient, pod.Namespace, pod.Name, *oldStatus, mergePodStatus(*oldStatus, status.status))
+	newPod, patchBytes, err := statusutil.PatchPodStatus(m.kubeClient, pod.Namespace, pod.Name, *oldStatus, mergePodStatus(*oldStatus, status.status))
 	glog.V(3).Infof("Patch status for pod %q with %q", format.Pod(pod), patchBytes)
 	if err != nil {
 		glog.Warningf("Failed to update status for pod %q: %v", format.Pod(pod), err)
